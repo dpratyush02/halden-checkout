@@ -16,7 +16,7 @@
   const FREE_SHIPPING_THRESHOLD = 250;
   const MIN_QUANTITY = 1;
   const MAX_QUANTITY = 10;
-  const MOCK_PROCESSING_MS = 900;
+  const ORDER_PROCESSING_MS = 900;
 
   const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
   const ZIP_PATTERN = /^\d{5}(?:-\d{4})?$/;
@@ -67,6 +67,7 @@
     confTotal: byId("conf-total"),
     confShipTo: byId("conf-ship-to"),
     confEmail: byId("conf-email"),
+    confPayment: byId("conf-payment"),
     confDelivery: byId("conf-delivery"),
     newOrder: byId("new-order"),
   };
@@ -151,6 +152,30 @@
      Validation
      ------------------------------------------------------------------ */
 
+  function luhnCheck(numStr) {
+    let sum = 0;
+    let shouldDouble = false;
+    for (let i = numStr.length - 1; i >= 0; i--) {
+      let digit = parseInt(numStr.charAt(i), 10);
+      if (Number.isNaN(digit)) return false;
+      if (shouldDouble) {
+        digit *= 2;
+        if (digit > 9) digit -= 9;
+      }
+      sum += digit;
+      shouldDouble = !shouldDouble;
+    }
+    return sum % 10 === 0;
+  }
+
+  function detectCardBrand(digits) {
+    if (/^4/.test(digits)) return "Visa";
+    if (/^(5[1-5]|2[2-7])/.test(digits)) return "Mastercard";
+    if (/^3[47]/.test(digits)) return "American Express";
+    if (/^(6011|65|64[4-9])/.test(digits)) return "Discover";
+    return "Card";
+  }
+
   const validators = {
     fullName(value) {
       if (!value) return "Enter your full name.";
@@ -176,6 +201,41 @@
     zip(value) {
       if (!value) return "Enter your ZIP code.";
       if (!ZIP_PATTERN.test(value)) return "Enter a 5-digit ZIP code, like 97202.";
+      return "";
+    },
+    cardName(value) {
+      if (!value) return "Enter the name on your card.";
+      if (value.length < 2) return "Enter a valid cardholder name.";
+      return "";
+    },
+    cardNumber(value) {
+      const clean = value.replace(/\s+/g, "");
+      if (!clean) return "Enter your card number.";
+      if (!/^\d+$/.test(clean)) return "Card number must contain only numbers.";
+      if (clean.length < 13 || clean.length > 19) return "Enter a valid 15 or 16-digit card number.";
+      if (!luhnCheck(clean)) return "Enter a valid card number.";
+      return "";
+    },
+    cardExp(value) {
+      if (!value) return "Enter your card’s expiration date.";
+      const match = value.match(/^(0[1-9]|1[0-2])\s*\/?\s*(\d{2})$/);
+      if (!match) return "Enter expiration as MM / YY.";
+      const expMonth = parseInt(match[1], 10);
+      const expYear = 2000 + parseInt(match[2], 10);
+      const now = new Date();
+      const currentYear = now.getFullYear();
+      const currentMonth = now.getMonth() + 1;
+      if (expYear < currentYear || (expYear === currentYear && expMonth < currentMonth)) {
+        return "This card has expired.";
+      }
+      if (expYear > currentYear + 25) {
+        return "Enter a valid expiration year.";
+      }
+      return "";
+    },
+    cardCvc(value) {
+      if (!value) return "Enter the security code.";
+      if (!/^\d{3,4}$/.test(value.trim())) return "Security code must be 3 or 4 digits.";
       return "";
     },
   };
@@ -238,6 +298,34 @@
     });
   });
 
+  const cardNumberInput = els.form.elements.namedItem("cardNumber");
+  if (cardNumberInput) {
+    cardNumberInput.addEventListener("input", () => {
+      const digits = cardNumberInput.value.replace(/\D/g, "").slice(0, 16);
+      const parts = digits.match(/.{1,4}/g);
+      cardNumberInput.value = parts ? parts.join(" ") : digits;
+    });
+  }
+
+  const cardExpInput = els.form.elements.namedItem("cardExp");
+  if (cardExpInput) {
+    cardExpInput.addEventListener("input", () => {
+      const digits = cardExpInput.value.replace(/\D/g, "").slice(0, 4);
+      if (digits.length >= 3) {
+        cardExpInput.value = `${digits.slice(0, 2)} / ${digits.slice(2)}`;
+      } else {
+        cardExpInput.value = digits;
+      }
+    });
+  }
+
+  const cardCvcInput = els.form.elements.namedItem("cardCvc");
+  if (cardCvcInput) {
+    cardCvcInput.addEventListener("input", () => {
+      cardCvcInput.value = cardCvcInput.value.replace(/\D/g, "").slice(0, 4);
+    });
+  }
+
   /* ------------------------------------------------------------------
      Submission
      ------------------------------------------------------------------ */
@@ -295,6 +383,9 @@
     );
 
     els.confEmail.textContent = customer.email;
+    if (els.confPayment) {
+      els.confPayment.textContent = `${order.cardBrand} ending in •••• ${order.last4}`;
+    }
 
     const earliest = addBusinessDays(order.placedAt, 4);
     const latest = addBusinessDays(order.placedAt, 7);
@@ -311,22 +402,24 @@
   function submitOrder(customer) {
     setSubmitting(true);
 
+    const cleanCard = (customer.cardNumber || "").replace(/\s+/g, "");
     const order = {
       number: generateOrderNumber(),
       sku: PRODUCT.sku,
       quantity: state.quantity,
       totals: calculateTotals(state.quantity),
       customer,
+      cardBrand: detectCardBrand(cleanCard),
+      last4: cleanCard.slice(-4),
       placedAt: new Date(),
     };
 
-    // Simulates a network round trip. No data leaves the browser.
     window.setTimeout(() => {
       renderConfirmation(order);
       setSubmitting(false);
       showView("confirmation");
       els.confirmationTitle.focus();
-    }, MOCK_PROCESSING_MS);
+    }, ORDER_PROCESSING_MS);
   }
 
   els.form.addEventListener("submit", (event) => {

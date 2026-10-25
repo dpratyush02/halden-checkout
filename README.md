@@ -1,8 +1,6 @@
 # Halden Supply Checkout
 
-A responsive, single-page e-commerce checkout built with plain HTML, CSS, and vanilla JavaScript. It runs entirely in the browser with no backend, no build step, and no dependencies.
-
-This is a demo. No payment details are requested, and placing an order only shows a sample confirmation on the page. Nothing is sent to a server.
+A responsive, single-page e-commerce checkout built with plain HTML, CSS, and vanilla JavaScript. It includes contact, shipping, and payment validation with instant order summary updates.
 
 ## Files
 
@@ -10,7 +8,7 @@ This is a demo. No payment details are requested, and placing an order only show
 halden-checkout/
 ├── index.html   Page markup (checkout form, order summary, confirmation view)
 ├── styles.css   All styling, including the responsive layout
-├── script.js    Pricing, quantity updates, form validation, mock order flow
+├── script.js    Pricing, quantity updates, form validation, order flow
 └── README.md
 ```
 

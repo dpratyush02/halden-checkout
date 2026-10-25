@@ -210,6 +210,10 @@ h1 {
   gap: 16px;
 }
 
+.field-row--equal {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+}
+
 label {
   display: block;
   margin-bottom: 6px;
@@ -320,27 +324,69 @@ label {
   color: var(--error);
 }
 
-.payment-note {
+.payment-header {
   display: flex;
-  gap: 14px;
-  padding: 16px 18px;
-  font-size: 0.9375rem;
-  color: #2b4a3d;
-  background: var(--pine-tint);
-  border-radius: 12px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 4px;
 }
 
-.payment-note svg {
-  width: 24px;
-  height: 24px;
-  flex: none;
-  color: var(--pine);
+.payment-header .section-title {
+  margin-bottom: 0;
 }
 
-.payment-note__title {
-  margin-bottom: 2px;
-  font-weight: 600;
-  color: var(--ink);
+.card-icons {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.card-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3px 6px;
+  font-family: var(--font-display);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+  background: var(--panel);
+  border: 1px solid var(--line-strong);
+  border-radius: 4px;
+  line-height: 1;
+}
+
+.payment-subtitle {
+  margin: 0 0 18px;
+  font-size: 0.8125rem;
+  color: var(--muted);
+}
+
+.input-with-icon {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-with-icon .field__input {
+  padding-right: 46px;
+}
+
+.input-icon {
+  position: absolute;
+  right: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--subtle);
+  pointer-events: none;
+}
+
+.input-icon svg {
+  width: 22px;
+  height: 22px;
 }
 
 /* Place order button ---------------------------------------------------- */

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Checkout for Halden Supply. Demo store, no payment is collected.">
+  <meta name="description" content="Secure checkout for Halden Supply. Handcrafted rolltop packs and gear.">
   <title>Checkout | Halden Supply</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -25,7 +25,7 @@
           <rect x="4" y="9" width="12" height="8" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/>
           <path d="M7 9V6.5a3 3 0 0 1 6 0V9" fill="none" stroke="currentColor" stroke-width="1.6"/>
         </svg>
-        Demo checkout. No payment is taken.
+        Secure 256-bit encrypted checkout
       </p>
     </div>
   </header>
@@ -98,20 +98,64 @@
               </div>
             </fieldset>
 
-            <section class="form-section" aria-labelledby="payment-title">
-              <h2 class="section-title" id="payment-title">Payment</h2>
-              <div class="payment-note">
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <rect x="2.5" y="5" width="19" height="14" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.6"/>
-                  <path d="M2.5 9.5h19" stroke="currentColor" stroke-width="1.6"/>
-                  <path d="M6 15h4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
-                </svg>
-                <div>
-                  <p class="payment-note__title">No payment needed</p>
-                  <p>This is a demo store. Placing an order creates a sample confirmation. No card details are collected or charged.</p>
+            <fieldset class="form-section">
+              <div class="payment-header">
+                <legend class="section-title" id="payment-title">Payment</legend>
+                <div class="card-icons" aria-label="Accepted payment methods">
+                  <span class="card-badge">VISA</span>
+                  <span class="card-badge">MC</span>
+                  <span class="card-badge">AMEX</span>
+                  <span class="card-badge">DISC</span>
                 </div>
               </div>
-            </section>
+              <p class="payment-subtitle">All transactions are encrypted and secured.</p>
+
+              <div class="field">
+                <label for="cardName">Name on card <span class="req" aria-hidden="true">*</span></label>
+                <input class="field__input" id="cardName" name="cardName" type="text"
+                       autocomplete="cc-name" placeholder="Maya Okafor" required
+                       aria-describedby="cardName-error">
+                <p class="field__error" id="cardName-error"></p>
+              </div>
+
+              <div class="field">
+                <label for="cardNumber">Card number <span class="req" aria-hidden="true">*</span></label>
+                <div class="input-with-icon">
+                  <input class="field__input" id="cardNumber" name="cardNumber" type="text"
+                         autocomplete="cc-number" inputmode="numeric" placeholder="4242 •••• •••• 4242"
+                         maxlength="19" required
+                         aria-describedby="cardNumber-error">
+                  <span class="input-icon" id="card-brand-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6">
+                      <rect x="2.5" y="5" width="19" height="14" rx="2.5"/>
+                      <path d="M2.5 9.5h19"/>
+                      <path d="M6 15h4" stroke-linecap="round"/>
+                    </svg>
+                  </span>
+                </div>
+                <p class="field__error" id="cardNumber-error"></p>
+              </div>
+
+              <div class="field-row field-row--equal">
+                <div class="field">
+                  <label for="cardExp">Expiration <span class="req" aria-hidden="true">*</span></label>
+                  <input class="field__input" id="cardExp" name="cardExp" type="text"
+                         autocomplete="cc-exp" inputmode="numeric" placeholder="MM / YY"
+                         maxlength="7" required
+                         aria-describedby="cardExp-error">
+                  <p class="field__error" id="cardExp-error"></p>
+                </div>
+
+                <div class="field">
+                  <label for="cardCvc">Security code <span class="req" aria-hidden="true">*</span></label>
+                  <input class="field__input" id="cardCvc" name="cardCvc" type="password"
+                         autocomplete="cc-csc" inputmode="numeric" placeholder="CVC"
+                         maxlength="4" required
+                         aria-describedby="cardCvc-error">
+                  <p class="field__error" id="cardCvc-error"></p>
+                </div>
+              </div>
+            </fieldset>
 
             <button class="place-order" id="place-order" type="submit">
               <span class="place-order__main">
@@ -228,6 +272,7 @@
         <dl class="details">
           <div><dt>Ship to</dt><dd class="details__address" id="conf-ship-to"></dd></div>
           <div><dt>Contact</dt><dd id="conf-email"></dd></div>
+          <div><dt>Payment method</dt><dd id="conf-payment"></dd></div>
           <div><dt>Estimated delivery</dt><dd id="conf-delivery"></dd></div>
         </dl>
 
